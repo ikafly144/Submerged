@@ -1,10 +1,14 @@
-﻿name: Build
+name: Release
 
 on:
   push:
-    branches:
-      - "*"
+    tags:
+      - "v*"
+      - "[0-9]+.*"
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
@@ -12,7 +16,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -34,13 +38,6 @@ jobs:
       - name: Build Release
         run: dotnet build -c Release --no-restore
 
-      - name: Upload mod dll
-        uses: actions/upload-artifact@v7
-        with:
-          name: Submerged
-          path: Submerged/bin/Submerged/Release/net6.0/Submerged.dll
-          archive: false
-
       - name: Cache BepInEx and Reactor download
         id: cache
         uses: actions/cache@v5
@@ -57,7 +54,7 @@ jobs:
           ARCHIVE_NAME_X86=$(grep -o "BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.${BEPINEX_VERSION}+[^\"']*.zip" build_page.html)
           curl -o BepInEx_x64.zip https://builds.bepinex.dev/projects/bepinex_be/${BEPINEX_VERSION}/${ARCHIVE_NAME_X64}
           curl -o BepInEx_x86.zip https://builds.bepinex.dev/projects/bepinex_be/${BEPINEX_VERSION}/${ARCHIVE_NAME_X86}
-          mkdir BepInEx
+          mkdir -p BepInEx
           unzip BepInEx_x64.zip -d BepInEx/x64
           unzip BepInEx_x86.zip -d BepInEx/x86
           chmod -R u+rwx BepInEx
@@ -74,18 +71,19 @@ jobs:
         run: |
           cp Submerged/bin/Submerged/Release/net6.0/Submerged.dll BepInEx/x64/BepInEx/plugins/Submerged.dll
           cp Submerged/bin/Submerged/Release/net6.0/Submerged.dll BepInEx/x86/BepInEx/plugins/Submerged.dll
+          cd BepInEx/x64 && zip -r ../../Submerged+dependencies.Epic.MSStore.zip . && cd ../..
+          cd BepInEx/x86 && zip -r ../../Submerged+dependencies.Steam.Itch.zip . && cd ../..
 
-      - name: Upload x64 mod archive
-        uses: actions/upload-artifact@v7
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
         with:
-          name: Submerged+dependencies (Epic, MSStore)
-          path: BepInEx/x64
-
-      - name: Upload x86 mod archive
-        uses: actions/upload-artifact@v7
-        with:
-          name: Submerged+dependencies (Steam, Itch)
-          path: BepInEx/x86
+          files: |
+            Submerged/bin/Submerged/Release/net6.0/Submerged.dll
+            Submerged+dependencies.Epic.MSStore.zip
+            Submerged+dependencies.Steam.Itch.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Cleanup folders for caching
         run: |
