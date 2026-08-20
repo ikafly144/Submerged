@@ -1,4 +1,4 @@
-name: Build
+﻿name: Build
 
 on:
   push:
@@ -22,7 +22,8 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9
+          dotnet-version: 10
+          cache: false
 
       - name: Restore NuGet packages
         run: dotnet restore
