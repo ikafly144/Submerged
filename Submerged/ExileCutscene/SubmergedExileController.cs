@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using BepInEx.Unity.IL2CPP.Utils;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using Il2CppInterop.Runtime.Attributes;
@@ -218,7 +218,7 @@ public sealed class SubmergedExileController(nint ptr) : ExileController(ptr)
             PlayerControl.LocalPlayer.SetKillTimer(GameManager.Instance.LogicOptions.GetKillCooldown());
             ShipStatus.Instance.EmergencyCooldown = GameManager.Instance.LogicOptions.GetEmergencyCooldown();
             HudManager.Instance.PlayerCam.Locked = false;
-            HudManager.Instance.SetMapButtonEnabled(true);
+            HudManager.Instance.SetMapAndInfoButtonsEnabled(true);
             HudManager.Instance.SetHudActive(true);
             ControllerManager.Instance.CloseAndResetAll();
         }

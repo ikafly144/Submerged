@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using BepInEx.Unity.IL2CPP.Utils;
 using Il2CppInterop.Runtime.Attributes;
@@ -419,7 +419,7 @@ public class SubmarineSelectSpawn(nint ptr) : Minigame(ptr)
         PlayerControl.LocalPlayer.SetKillTimer(GameManager.Instance.LogicOptions.GetKillCooldown());
         ShipStatus.Instance.EmergencyCooldown = GameManager.Instance.LogicOptions.GetEmergencyCooldown();
         HudManager.Instance.PlayerCam.Locked = false;
-        HudManager.Instance.SetMapButtonEnabled(true);
+        HudManager.Instance.SetMapAndInfoButtonsEnabled(true);
         HudManager.Instance.SetHudActive(true);
         ControllerManager.Instance.CloseAndResetAll();
 
